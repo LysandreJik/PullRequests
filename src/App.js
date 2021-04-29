@@ -22,13 +22,19 @@ class App extends React.Component {
 		// Compute up to when should we skim the PRs in order to get every PR merged. Skims through 100 pages at a time,
 		// only fetching a PR every 100 PRs.
 		let lastPrDate = new Date();
-		let pageNumber = 1;
+		let pageNumber = 0;
 		while(lastPrDate > fetchUpToDate){
-			const currentIndex = (pageNumber + 1) * 100;
+			const currentIndex = pageNumber * 100;
 			const result = await fetch(`https://api.github.com/repos/${this.state.repo}/pulls?state=closed&per_page=1&page=${currentIndex}`)
+			console.log(`https://api.github.com/repos/${this.state.repo}/pulls?state=closed&per_page=1&page=${currentIndex}`)
 			const jsonResult= await result.json();
-			const currentPR = jsonResult[0]
 
+			if (jsonResult.length == 0) {
+				break;
+			}
+
+			const currentPR = jsonResult[0]
+			console.log(currentPR);
 			pageNumber++;
 			lastPrDate = new Date(currentPR.created_at)
 		}
